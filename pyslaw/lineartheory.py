@@ -6,24 +6,28 @@ import numpy as np
 class LinearModel(object):
     def __init__(self,x,h,U,N):
         # assert x, h are one-dimensional
-        # assert x is even
-        assert(x.size==h.size)
-        assert(np.unique(np.diff(x)).size==1)
-        assert(all(np.isreal(h)))
+        assert(x.size % 2 == 0), 'Size of x must be even'
+        assert(x.size == h.size), 'Size of x must match size of h'
+        assert(np.unique(np.diff(x)).size==1), 'x must be spaced equidistantly'
+        assert(all(np.isreal(h))), 'h should be real-valued'
 
+        # Store wind speed and Brunt Vaisala frequency
         self.U = U
         self.N = N
-        self.Nx = x.size
-        self.dx = np.unique(np.diff(x))
-
-        self.k = 2.0 * np.pi * np.fft.rfftfreq(self.Nx,self.dx)
+        
+        # Calculate horizontal wave numbers
+        dx = np.unique(np.diff(x))
+        self.k = 2.0 * np.pi * np.fft.rfftfreq(x.size,dx)
+        # Calculate vertical wave numbers
         self.m = self.vertical_wavenumbers()
 
+        # Store FFT of input signal h
         self.hc = np.fft.rfft(h)
         
 
     def solve(self,varname,z):
         assert(varname in ['eta','u','w','p'])
+
         if np.isscalar(z): z = np.array([z])
 
         if varname == 'eta':
