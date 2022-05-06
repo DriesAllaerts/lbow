@@ -1,0 +1,2 @@
+# Python packages and versions needed to install pyslaw
+numpy>=1.18.1
