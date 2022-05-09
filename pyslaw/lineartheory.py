@@ -48,12 +48,12 @@ class LinearModel(object):
 
     def vertical_wavenumbers(self):
         m = np.zeros(self.k.shape,dtype=np.complex128)
-        #Propagating waves
-        iprop = np.where((self.U*self.k)**2>self.N**2)
-        #Evanescent waves (excluding where U*k=0, for which m is set to zero) 
-        ievan = np.where(~(((-self.U*self.k)==0) | ((self.U*self.k)**2>self.N**2)))
+        #Evanescent waves
+        ievan = np.where((self.U*self.k)**2>self.N**2)
+        #Propagating waves (excluding where U*k=0, for which m is set to zero) 
+        iprop = np.where(~(((-self.U*self.k)==0) | ((self.U*self.k)**2>self.N**2)))
     
-        m[iprop] = 1j*np.abs(self.k[iprop])*np.sqrt(1-self.N**2/(self.U*self.k[iprop])**2)
-        m[ievan] = -np.sign(-self.U*self.k[ievan])*np.abs(self.k[ievan])*np.sqrt(self.N**2/(self.U*self.k[ievan])**2-1)
+        m[ievan] = 1j*np.abs(self.k[ievan])*np.sqrt(1-self.N**2/(self.U*self.k[ievan])**2)
+        m[iprop] = -np.sign(-self.U*self.k[iprop])*np.abs(self.k[iprop])*np.sqrt(self.N**2/(self.U*self.k[iprop])**2-1)
         return m
 
