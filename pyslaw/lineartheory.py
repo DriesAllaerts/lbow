@@ -3,6 +3,8 @@ Library for solving linear atmospheric gravity wave problems
 """
 import numpy as np
 
+#TODO: Decide on sign of m in the solution, not when calculating m in general
+#TODO: Make iprop and ievan separate functions
 class LinearModel(object):
     def __init__(self,x,h,U,N):
         # assert x, h are one-dimensional
@@ -10,6 +12,7 @@ class LinearModel(object):
         assert(x.size == h.size), 'Size of x must match size of h'
         assert(np.unique(np.diff(x)).size==1), 'x must be spaced equidistantly'
         assert(all(np.isreal(h))), 'h should be real-valued'
+        assert(U != 0), 'Background wind speed should be non-zero'
 
         # Store wind speed and Brunt Vaisala frequency
         self.U = U
@@ -31,6 +34,8 @@ class LinearModel(object):
         if np.isscalar(z): z = np.array([z])
 
         if varname == 'eta':
+            # Solving d**2 eta/dz**2 + m**2 z = 0
+            # Solution of the form eta = A exp(jmz) + B exp(-jmz)
             var = self.hc[:,np.newaxis] * np.exp(1j*self.m[:,np.newaxis]*z)
         elif varname == 'w':
             # From definition w = U * d(eta)/dx
@@ -54,6 +59,8 @@ class LinearModel(object):
         iprop = np.where(~(((-self.U*self.k)==0) | ((self.U*self.k)**2>self.N**2)))
     
         m[ievan] = 1j*np.abs(self.k[ievan])*np.sqrt(1-self.N**2/(self.U*self.k[ievan])**2)
+        # w_g = -Omega*m/kappa**2, so choose sign(m)=-sign(Omega).
+        # for stationary waves, omega=Omega+U*k=0, so Omega=-U*k
         m[iprop] = -np.sign(-self.U*self.k[iprop])*np.abs(self.k[iprop])*np.sqrt(self.N**2/(self.U*self.k[iprop])**2-1)
         return m
 
