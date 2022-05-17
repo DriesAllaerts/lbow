@@ -7,6 +7,14 @@ import numpy as np
 #TODO: Make iprop and ievan separate functions
 class LinearModel(object):
     def __init__(self,x,h,U,N):
+        """Initialize model and set governing parameters
+
+        Args:
+            x (array): x coordinates
+            h (array): surface elevation at x coordinates
+            U (float): wind speed
+            N (float): Brunt-Vaisala frequency
+        """
         # assert x, h are one-dimensional
         assert(x.size % 2 == 0), 'Size of x must be even'
         assert(x.size == h.size), 'Size of x must match size of h'
@@ -29,6 +37,15 @@ class LinearModel(object):
         
 
     def solve(self,varname,z):
+        """Solve model at specified heights
+
+        Args:
+            varname (str): name of the variable to be calculated (eta, u, w, or p)
+            z (float or array): heights at which the variable is calculated
+
+        Returns:
+            array: model solution at x coordinates and specified heights
+        """
         assert(varname in ['eta','u','w','p'])
 
         if np.isscalar(z): z = np.array([z])
@@ -36,22 +53,28 @@ class LinearModel(object):
         if varname == 'eta':
             # Solving d**2 eta/dz**2 + m**2 z = 0
             # Solution of the form eta = A exp(jmz) + B exp(-jmz)
-            var = self.hc[:,np.newaxis] * np.exp(1j*self.m[:,np.newaxis]*z)
+            A = self.hc
         elif varname == 'w':
             # From definition w = U * d(eta)/dx
-            var = 1j*self.U*self.k[:,np.newaxis] * self.hc[:,np.newaxis] * np.exp(1j*self.m[:,np.newaxis]*z)
+            A = 1j*self.U*self.k * self.hc
         elif varname == 'u':
             # From continuity equation du/dx + dw/dz = 0
-            var = -1j*self.U*self.m[:,np.newaxis] * self.hc[:,np.newaxis] * np.exp(1j*self.m[:,np.newaxis]*z)
+            A = -1j*self.U*self.m * self.hc
         elif varname == 'p':
             # From x-momentum equation U * du/dx = - dp/dx
-            var = 1j * self.U**2 * self.m[:,np.newaxis] * self.hc[:,np.newaxis] * np.exp(1j*self.m[:,np.newaxis]*z)
+            A = 1j * self.U**2 * self.m * self.hc
 
+        var = A[:,np.newaxis] * np.exp(1j*self.m[:,np.newaxis]*z)
         # Set defunct modes to zero
         var[-1,:] = 0.
         return np.squeeze(np.fft.irfft(var,axis=0))
 
     def vertical_wavenumbers(self):
+        """Calculate vertical wavenumbers
+
+        Returns:
+            array: vertical wave numbers
+        """
         m = np.zeros(self.k.shape,dtype=np.complex128)
         #Evanescent waves
         ievan = np.where((self.U*self.k)**2>self.N**2)
