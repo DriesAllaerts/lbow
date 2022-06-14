@@ -34,8 +34,7 @@ class OneLayerModel(object):
         self.m = self.vertical_wavenumbers()
 
         # Store FFT of input signal h
-        # Scale such that hc[0] = mean(h)
-        self.hc = np.fft.rfft(h)/self.Nx
+        self.hc = np.fft.rfft(h,norm='forward')
 
     def vertical_wavenumbers(self):
         """Calculate vertical wavenumbers
@@ -115,7 +114,7 @@ class ChannelModel(OneLayerModel):
         # Set mean and defunct modes to zero
         var[-1,:] = 0.
         var[0,:]  = 0.
-        return self.Nx * np.squeeze(np.fft.irfft(var,axis=0))
+        return np.squeeze(np.fft.irfft(var,axis=0,norm='forward'))
 
 class HalfPlaneModel(OneLayerModel):
     def solve(self,varname,z):
@@ -150,6 +149,6 @@ class HalfPlaneModel(OneLayerModel):
         var = A[:,np.newaxis] * np.exp(1j*self.m[:,np.newaxis]*z)
         # Set defunct modes to zero
         var[-1,:] = 0.
-        return self.Nx * np.squeeze(np.fft.irfft(var,axis=0))
+        return np.squeeze(np.fft.irfft(var,axis=0,norm='forward'))
 
 
