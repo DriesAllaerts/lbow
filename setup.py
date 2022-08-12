@@ -4,12 +4,12 @@ with open('requirements.txt') as f:
     REQUIREMENTS = f.read().splitlines()
 
 setup(
-    name='pyslaw',
+    name='lbow',
     version='0.1.0',
-    description='Python project for solving linear atmospheric gravity waves problems',
+    description='Python package for solving linear buoyancy waves problems',
     author='Dries Allaerts',
     license='',
-    packages=find_packages(include=['pyslaw']),
+    packages=find_packages(include=['lbow']),
     install_requires=REQUIREMENTS,
     extras_require={
         'interactive': ['jupyter', 'matplotlib']

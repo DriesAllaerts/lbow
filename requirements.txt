@@ -1,2 +1,2 @@
-# Python packages and versions needed to install pyslaw
+# Python packages and versions needed to install lbow
 numpy>=1.18.1

@@ -1,5 +1,5 @@
 """
-Library for solving steady state linear atmospheric gravity wave problems
+Library for solving steady state linear buoyancy wave problems
 """
 import numpy as np
 
