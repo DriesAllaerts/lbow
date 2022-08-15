@@ -20,7 +20,7 @@ This software has been developed by
 **Dries Allaerts** ![ORCID logo](https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png) [0000-0002-8758-3952](https://orcid.org/0000-0002-8758-3952), Technische Universiteit Delft
 
 ## License
-The contents of this repository are licensed under an **Apache License v2.0** (see [LICENSE](https://github.com/DriesAllaerts/lbow/blob/main/LICENSE) file).
+The contents of this repository are licensed under an **Apache License v2.0** (see [LICENSE](LICENSE) file).
 
 Copyright notice:
 
