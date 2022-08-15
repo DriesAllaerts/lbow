@@ -1,9 +1,13 @@
 """
 Library for solving transient linear buoyancy wave problems
 """
+
 import numpy as np
 
 class OneLayerModel(object):
+    """
+    Base class for steady state models consisting of one layer
+    """
     def __init__(self,x,t,h,U,N):
         """Initialize model and set governing parameters
 
@@ -14,11 +18,11 @@ class OneLayerModel(object):
             U (float): wind speed
             N (float): Brunt-Vaisala frequency
         """
-        # assert x, h are one-dimensional
-        #assert(x.size % 2 == 0), 'Size of x must be even'
-        #assert(x.size == h.size), 'Size of x must match size of h'
-        #assert(np.unique(np.diff(x)).size==1), 'x must be spaced equidistantly'
-        #assert(all(np.isreal(h))), 'h should be real-valued'
+        # Assertions
+        assert(len(x.shape)==2), 'x must be a two-dimensional grid'
+        assert(x.shape == t.shape), 'x and t must have same dimensions'
+        assert(x.shape == h.shape), 'x and h must have same dimensions'
+        assert(np.isreal(h).all()), 'h should be real-valued'
         assert(U != 0), 'Background wind speed should be non-zero'
 
         # Store wind speed and Brunt Vaisala frequency
@@ -34,6 +38,12 @@ class OneLayerModel(object):
             indexing = 'xy'
             xaxis = 1
             taxis = 0
+
+        # Some more assertions
+        assert(x.shape[xaxis] % 2 == 0), 'Number of grid points in x direction should be even'
+        assert(x.shape[taxis] % 2 == 0), 'Number of grid points in t direction should be even'
+        assert(np.unique(np.diff(x,axis=xaxis)).size==1), 'x must be spaced equidistantly'
+        assert(np.unique(np.diff(t,axis=taxis)).size==1), 't must be spaced equidistantly'
 
         # Calculate horizontal wave numbers and frequencies
         dx = np.unique(np.diff(x,axis=xaxis))
@@ -86,12 +96,16 @@ class OneLayerModel(object):
         
 
 class HalfPlaneModel(OneLayerModel):
+    """
+    Transient one-layer model with the ground surface as bottom boundary
+    and the top boundary at infinity (radiation boundary condition)
+    """
     def solve(self,varname,z):
         """Solve model at specified heights
 
         Args:
             varname (str): name of the variable to be calculated (eta, u, w, or p)
-            z (float or array): heights at which the variable is calculated
+            z (float or array): height(s) at which the variable is calculated
 
         Returns:
             array: model solution at x coordinates and specified heights

@@ -1,11 +1,13 @@
 """
 Library for solving steady state linear buoyancy wave problems
 """
+
 import numpy as np
 
-#TODO: Decide on sign of m in the solution, not when calculating m in general
-#TODO: Make iprop and ievan separate functions
 class OneLayerModel(object):
+    """
+    Base class for steady state models consisting of one layer
+    """
     def __init__(self,x,h,U,N):
         """Initialize model and set governing parameters
 
@@ -15,12 +17,14 @@ class OneLayerModel(object):
             U (float): wind speed
             N (float): Brunt-Vaisala frequency
         """
-        # assert x, h are one-dimensional
-        assert(x.size % 2 == 0), 'Size of x must be even'
-        assert(x.size == h.size), 'Size of x must match size of h'
+
+        # Assertions
+        assert(len(x.shape)==1), 'x must be a one-dimensional array'
+        assert(x.size % 2 == 0), 'size of x must be even'
         assert(np.unique(np.diff(x)).size==1), 'x must be spaced equidistantly'
+        assert(x.shape == h.shape), 'x and h must have same dimensions'
         assert(all(np.isreal(h))), 'h should be real-valued'
-        assert(U != 0), 'Background wind speed should be non-zero'
+        assert(U != 0), 'background wind speed should be non-zero'
 
         # Store wind speed and Brunt Vaisala frequency
         self.U = U
@@ -55,7 +59,20 @@ class OneLayerModel(object):
         return m
         
 class ChannelModel(OneLayerModel):
+    """
+    Steady state one-layer model with the ground surface as bottom boundary
+    and a rigid lid as the top boundary
+    """
     def __init__(self,x,h,U,N,H):
+        """Initialize model and set governing parameters
+
+        Args:
+            x (array): x coordinates
+            h (array): surface elevation at x coordinates
+            U (float): wind speed
+            N (float): Brunt-Vaisala frequency
+            H (float): Height of the top boundary
+        """
         super().__init__(x,h,U,N)
 
         assert(H>0), 'H must be positive'
@@ -66,7 +83,7 @@ class ChannelModel(OneLayerModel):
 
         Args:
             varname (str): name of the variable to be calculated (eta, u, w, or p)
-            z (float or array): heights at which the variable is calculated
+            z (float or array): height(s) at which the variable is calculated
 
         Returns:
             array: model solution at x coordinates and specified heights
@@ -94,6 +111,7 @@ class ChannelModel(OneLayerModel):
 
             # From definition w = U * d(eta)/dx
             if varname == 'w': var *= self.U * 1j * self.k[:, np.newaxis]
+
         elif varname in ['u', 'p']:
             # From continuity equation du/dx + dw/dz = 0
 
@@ -114,15 +132,20 @@ class ChannelModel(OneLayerModel):
         # Set mean and defunct modes to zero
         var[-1,:] = 0.
         var[0,:]  = 0.
+
         return np.squeeze(np.fft.irfft(var,axis=0,norm='forward'))
 
 class HalfPlaneModel(OneLayerModel):
+    """
+    Steady state one-layer model with the ground surface as bottom boundary
+    and the top boundary at infinity (radiation boundary condition)
+    """
     def solve(self,varname,z):
         """Solve model at specified heights
 
         Args:
             varname (str): name of the variable to be calculated (eta, u, w, or p)
-            z (float or array): heights at which the variable is calculated
+            z (float or array): height(s) at which the variable is calculated
 
         Returns:
             array: model solution at x coordinates and specified heights
@@ -150,5 +173,3 @@ class HalfPlaneModel(OneLayerModel):
         # Set defunct modes to zero
         var[-1,:] = 0.
         return np.squeeze(np.fft.irfft(var,axis=0,norm='forward'))
-
-
