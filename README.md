@@ -4,7 +4,7 @@ LBoW is a python package to solve Linear Buoyancy Wave problems.
 See the `dev` branch for the latest code under development
 
 ## Requirements
-The code runs from python 3.10, but highest version is recommended. The core python libraries of the package only depend on numpy. Demonstration of the package is done in jupyter notebooks and depends on jupyter and matplotlib.
+The code runs from python 3.10, but highest version is recommended. The core python libraries of the package only depend on numpy. Demonstration of the package is done via jupyter notebooks and depends on jupyter and matplotlib.
 
 ## Installation
 To install, run `pip install -e lbow` after cloning the repository (or `pip install -e .` from inside `/path/to/lbow`)
@@ -24,8 +24,7 @@ The contents of this repository are licensed under an **Apache License v2.0** (s
 
 Copyright notice:
 
-Technische Universiteit Delft hereby disclaims all copyright interest in the program “LBoW”. LBoW is a python package to solve Linear Buoyancy Wave problems written by the Author(s).
-
+Technische Universiteit Delft hereby disclaims all copyright interest in the program “LBoW”. LBoW is a python package to solve Linear Buoyancy Wave problems written by the Author(s).\n
 Henri Werij, Dean of Faculty of Aerospace Engineering, Technische Universiteit Delft.
 
 © 2022, D. Allaerts
