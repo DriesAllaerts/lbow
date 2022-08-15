@@ -6,7 +6,7 @@ import numpy as np
 
 class OneLayerModel(object):
     """
-    Base class for steady state models consisting of one layer
+    Base class for transient models consisting of one layer
     """
     def __init__(self,x,t,h,U,N):
         """Initialize model and set governing parameters
