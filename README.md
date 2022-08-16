@@ -13,7 +13,6 @@ To install, run `pip install -e lbow` after cloning the repository (or `pip inst
 In this repository you can find:
 - `lbow/` directory containing the core python libraries
 - `notebooks/` directory containing jupyter notebooks demonstrating the use of the lbow package
-- `docs/` directory containing documentation
 
 ## Author(s)
 This software has been developed by
