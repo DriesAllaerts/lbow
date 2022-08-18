@@ -132,6 +132,5 @@ class HalfPlaneModel(OneLayerModel):
             pass
 
         var = A[np.newaxis,...] * np.exp(1j*self.m[np.newaxis,...]*z[:,np.newaxis,np.newaxis])
-        # Set defunct modes to zero
-#        var[-1,:] = 0.
+        # Set defunct modes to zero?
         return np.squeeze(np.fft.irfft2(var,axes=[-2,-1],norm='forward'))
