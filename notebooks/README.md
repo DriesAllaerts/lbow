@@ -6,4 +6,4 @@ The use of the LBoW package is demonstrated by means of jupyter notebooks. The f
   - [Trapped wave](3-steady-state--trapped-wave-solution.ipynb) notebook, showing the impact of an artificial rigid lid on downward wave reflections.
 - Transient flow problems
   - [Impulse response](4-transient--impulse-response.ipynb) notebook, illustrating the temporal evolution of buoyancy waves by approximating the impulse reponse.
-  - [Transition to steady state](5-transient--step-function.ipynb)("step function") notebook, illustrating the transition from unperturbed flow to a steady state buoyancy wave field.
+  - [Transition to steady state](5-transient--step-function.ipynb) ("step function") notebook, illustrating the transition from unperturbed flow to a steady state buoyancy wave field.
