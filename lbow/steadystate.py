@@ -62,14 +62,14 @@ class OneLayerModel(object):
         """
         m = np.zeros(self.k.shape,dtype=np.complex128)
         #Evanescent waves
-        ievan = np.where((self.U*self.k)**2>self.N**2)
+        ievan = np.where((-self.U*self.k)**2>self.N**2)
         #Propagating waves (excluding where U*k=0, for which m is set to zero) 
-        iprop = np.where(~(((-self.U*self.k)==0) | ((self.U*self.k)**2>self.N**2)))
+        iprop = np.where(~(((-self.U*self.k)==0) | ((-self.U*self.k)**2>self.N**2)))
     
-        m[ievan] = 1j*np.abs(self.k[ievan])*np.sqrt(1-self.N**2/(self.U*self.k[ievan])**2)
+        m[ievan] = 1j*np.abs(self.k[ievan])*np.sqrt(1-self.N**2/(-self.U*self.k[ievan])**2)
         # w_g = -Omega*m/kappa**2, so choose sign(m)=-sign(Omega).
         # for stationary waves, omega=Omega+U*k=0, so Omega=-U*k
-        m[iprop] = -np.sign(-self.U*self.k[iprop])*np.abs(self.k[iprop])*np.sqrt(self.N**2/(self.U*self.k[iprop])**2-1)
+        m[iprop] = -np.sign(-self.U*self.k[iprop])*np.abs(self.k[iprop])*np.sqrt(self.N**2/(-self.U*self.k[iprop])**2-1)
         return m
         
 class ChannelModel(OneLayerModel):

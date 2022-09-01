@@ -139,10 +139,12 @@ class HalfPlaneModel(OneLayerModel):
         elif varname == 'u':
             # From continuity equation du/dx + dw/dz = 0
             #A = -1j * self.Omega * self.m * self.hc / self.k
+            print('Currently, you can only solve for eta or w, solving for u is not (yet) implemented')
             pass
         elif varname == 'p':
             # From x-momentum equation U * du/dx = - dp/dx
             #A = 1j * self.U * self.Omega * self.m * self.hc / self.k
+            print('Currently, you can only solve for eta or w, solving for p is not (yet) implemented')
             pass
 
         var = A[np.newaxis,...] * np.exp(1j*self.m[np.newaxis,...]*z[:,np.newaxis,np.newaxis])
