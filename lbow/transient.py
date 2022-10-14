@@ -17,12 +17,14 @@ limitations under the License.
 """
 
 import numpy as np
+import multiprocessing
+import pyfftw
 
 class OneLayerModel(object):
     """
     Base class for transient models consisting of one layer
     """
-    def __init__(self,x,t,h,U,N):
+    def __init__(self,x,t,h,U,N,fftw_flag='FFTW_ESTIMATE'):
         """Initialize model and set governing parameters
 
         Args:
@@ -31,6 +33,7 @@ class OneLayerModel(object):
             h (array): surface elevation
             U (float): wind speed
             N (float): Brunt-Vaisala frequency
+            fftw_flag(string, optional): flag for the fftw algorithm
         """
         # Assertions
         assert(len(x.shape)==2), 'x must be a two-dimensional grid'
@@ -89,8 +92,19 @@ class OneLayerModel(object):
         # Calculate vertical wave numbers
         self.m = self.vertical_wavenumbers()
 
+        # Set up forward fft routine
+        hr = pyfftw.empty_aligned(h.shape,dtype='float64')
+        hc = pyfftw.empty_aligned(self.k.shape,dtype='complex128')
+
+        fft_object = pyfftw.FFTW(hr,hc,axes=(0,1),
+            flags=(fftw_flag,),
+            direction='FFTW_FORWARD',
+            threads=multiprocessing.cpu_count(),
+            normalise_idft=False
+        )
+
         # Store FFT of input signal h
-        self.hc = np.fft.rfft2(h,norm='forward')
+        self.hc = fft_object(h)
 
     def vertical_wavenumbers(self):
         """Calculate vertical wavenumbers
@@ -115,12 +129,13 @@ class HalfPlaneModel(OneLayerModel):
     Transient one-layer model with the ground surface as bottom boundary
     and the top boundary at infinity (radiation boundary condition)
     """
-    def solve(self,varname,z):
+    def solve(self,varname,z,fftw_flag='FFTW_ESTIMATE'):
         """Solve model at specified heights
 
         Args:
             varname (str): name of the variable to be calculated (eta, u, w, or p)
             z (float or array): height(s) at which the variable is calculated
+            fftw_flag(string, optional): flag for the fftw algorithm
 
         Returns:
             array: model solution at x coordinates and specified heights
@@ -150,4 +165,17 @@ class HalfPlaneModel(OneLayerModel):
 
         var = A[np.newaxis,...] * np.exp(1j*self.m[np.newaxis,...]*z[:,np.newaxis,np.newaxis])
         # Set defunct modes to zero?
-        return np.squeeze(np.fft.irfft2(var,axes=[-2,-1],norm='forward'))
+
+        # Set up inverse fft routine
+        var_c = pyfftw.empty_aligned(var.shape,dtype='complex128')
+        var_r = pyfftw.empty_aligned((var.shape[0],var.shape[1],2*var.shape[2]-2),dtype='float64')
+
+        ifft_object = pyfftw.FFTW(var_c,var_r,axes=(-2,-1),
+            flags=(fftw_flag,),
+            direction='FFTW_BACKWARD',
+            threads=multiprocessing.cpu_count(),
+            normalise_idft=False
+        )
+
+        return np.squeeze(ifft_object(var))
+        #return np.squeeze(np.fft.irfft2(var,axes=[-2,-1],norm='forward'))
