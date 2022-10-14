@@ -35,19 +35,20 @@ class OneLayerModel(object):
         # Assertions
         assert(len(x.shape)==1), 'x must be a one-dimensional array'
         assert(x.size % 2 == 0), 'size of x must be even'
-        assert(np.unique(np.diff(x)).size==1), 'x must be spaced equidistantly'
         assert(x.shape == h.shape), 'x and h must have same dimensions'
         assert(all(np.isreal(h))), 'h should be real-valued'
         assert(U != 0), 'background wind speed should be non-zero'
+
+        dx = np.unique(np.diff(x))
+        assert(np.allclose(dx,dx[0])), 'x must be spaced equidistantly'
 
         # Store wind speed and Brunt Vaisala frequency
         self.U = U
         self.N = N
         
         # Calculate horizontal wave numbers
-        dx = np.unique(np.diff(x))
         self.Nx = x.size
-        self.k = 2.0 * np.pi * np.fft.rfftfreq(self.Nx,dx)
+        self.k = 2.0 * np.pi * np.fft.rfftfreq(self.Nx,dx[0])
         # Calculate vertical wave numbers
         self.m = self.vertical_wavenumbers()
 

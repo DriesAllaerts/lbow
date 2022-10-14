@@ -53,30 +53,31 @@ class OneLayerModel(object):
             xaxis = 1
             taxis = 0
 
-        # Some more assertions
+        # Assert input coordinates have an even number of grid points
         assert(x.shape[xaxis] % 2 == 0), 'Number of grid points in x direction should be even'
         assert(x.shape[taxis] % 2 == 0), 'Number of grid points in t direction should be even'
-        assert(np.unique(np.diff(x,axis=xaxis)).size==1), 'x must be spaced equidistantly'
-        assert(np.unique(np.diff(t,axis=taxis)).size==1), 't must be spaced equidistantly'
+
+        self.Nx = x.shape[xaxis]
+        self.Nt = t.shape[taxis]
 
         # Calculate horizontal wave numbers and frequencies
         dx = np.unique(np.diff(x,axis=xaxis))
         dt = np.unique(np.diff(t,axis=taxis))
 
-        self.Nx = x.shape[xaxis]
-        self.Nt = t.shape[taxis]
+        assert(np.allclose(dx,dx[0])), 'x must be spaced equidistantly'
+        assert(np.allclose(dt,dt[0])), 't must be spaced equidistantly'
 
         # We use rfft2 for efficiency, which means the last axis
         # will be transformed using rfft and accordingly only uses
         # half of the wavenumbers/frequencies
         if indexing == 'ij':
             # last axis corresponds to t
-            k = 2.0 * np.pi * np.fft.fftfreq(self.Nx,dx)
-            omega = - 2.0 * np.pi * np.fft.rfftfreq(self.Nt,dt)
+            k = 2.0 * np.pi * np.fft.fftfreq(self.Nx,dx[0])
+            omega = - 2.0 * np.pi * np.fft.rfftfreq(self.Nt,dt[0])
         else:
             # last axis corresponds to x
-            k = 2.0 * np.pi * np.fft.rfftfreq(self.Nx,dx)
-            omega = - 2.0 * np.pi * np.fft.fftfreq(self.Nt,dt)
+            k = 2.0 * np.pi * np.fft.rfftfreq(self.Nx,dx[0])
+            omega = - 2.0 * np.pi * np.fft.fftfreq(self.Nt,dt[0])
         self.k, self.omega = np.meshgrid(k,omega,indexing=indexing)
         # Note the minus sign for the frequencies. This is because in linear theory
         # the solution is assumed to be a plane wave of the form exp[i(k*x-omega*t)],
