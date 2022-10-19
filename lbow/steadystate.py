@@ -188,3 +188,165 @@ class HalfPlaneModel(OneLayerModel):
         # Set defunct modes to zero
         var[-1,:] = 0.
         return np.squeeze(np.fft.irfft(var,axis=0,norm='forward'))
+
+
+class MultiLayerModel(object):
+    """
+    Class for steady state models consisting of multiple layers
+    """
+    def __init__(self,x,hs,U,N,hi):
+        """Initialize model and set governing parameters
+
+        Args:
+            x  (array): x coordinates
+            hs (array): surface elevation at x coordinates
+            U  (array): array of wind speeds in the various layers
+            N  (array): array of Brunt-Vaisala frequency in the various layers
+            hi (array): heights marking start and end of the various layers
+        """
+
+        # Assertions
+        assert(len(x.shape)==1), 'x must be a one-dimensional array'
+        assert(x.size % 2 == 0), 'size of x must be even'
+        assert(x.shape == hs.shape), 'x and hs must have same dimensions'
+        assert(all(np.isreal(hs))), 'hs should be real-valued'
+        assert(len(U) == len(N)), 'U and N should have the same size'
+        assert(len(U) == len(hi)), 'U and hi should have the same size'
+        assert(all(np.array(U) != 0)), 'background wind speed should be non-zero'
+        assert(all(np.array(N) >= 0)), 'Brunt-Vaisala frequency should be non-negative'
+        assert(all(np.diff(hi) > 0)), 'hi should be monotonically increasing'
+
+        dx = np.unique(np.diff(x))
+        assert(np.allclose(dx,dx[0])), 'x must be spaced equidistantly'
+
+        # Store wind speed and Brunt Vaisala frequency
+        self.Us = U
+        self.Ns = N
+
+        # Store heights and number of layers
+        self.Nl = len(U)
+        self.hi = hi
+        
+        # Calculate horizontal wave numbers
+        self.Nx = x.size
+        self.k = 2.0 * np.pi * np.fft.rfftfreq(self.Nx,dx[0])
+        self.Nk = self.k.size
+
+        # Calculate vertical wave numbers
+        self.m = np.zeros((self.Nk,self.Nl),dtype=np.complex128)
+        for l in range(self.Nl):
+            self.m[:,l] = self.vertical_wavenumbers(self.Us[l],self.Ns[l])
+
+        # Store FFT of input signal h
+        self.hc = np.fft.rfft(hs,norm='forward')
+
+    def vertical_wavenumbers(self,U,N):
+        """Calculate vertical wavenumbers
+
+        Returns:
+            array: vertical wave numbers
+        """
+        m = np.zeros(self.k.shape,dtype=np.complex128)
+        #Evanescent waves
+        ievan = np.where((-U*self.k)**2>N**2)
+        #Propagating waves (excluding where U*k=0, for which m is set to zero) 
+        iprop = np.where(~(((-U*self.k)==0) | ((-U*self.k)**2>N**2)))
+    
+        m[ievan] = 1j*np.abs(self.k[ievan])*np.sqrt(1-N**2/(-U*self.k[ievan])**2)
+        # w_g = -Omega*m/kappa**2, so choose sign(m)=-sign(Omega).
+        # for stationary waves, omega=Omega+U*k=0, so Omega=-U*k
+        m[iprop] = -np.sign(-U*self.k[iprop])*np.abs(self.k[iprop])*np.sqrt(N**2/(-U*self.k[iprop])**2-1)
+        return m
+
+    def solve(self,varname,z):
+        """Solve model at specified heights
+
+        Args:
+            varname (str): name of the variable to be calculated (eta, u, w, or p)
+            z (float or array): height(s) at which the variable is calculated
+
+        Returns:
+            array: model solution at x coordinates and specified heights
+        """
+        assert(varname in ['eta','u','w','p'])
+
+        if np.isscalar(z): z = np.array([z])
+        assert(all(z>=0)), 'All z must be positive'
+
+        # Create array of heights including a "top" height
+        hi = np.zeros(self.Nl+1)
+        hi[:-1] = self.hi[:]
+        hi[-1] = max(np.max(z)+1.e-6,self.hi[-1])
+
+        # For every k, solve system of linear equations for coefficients
+        # --------------------------------------------------------------
+        # Initialize A and B matrix
+        A = np.zeros((self.Nk,2*self.Nl,2*self.Nl),dtype=np.complex128)
+        B = np.zeros((self.Nk,2*self.Nl),dtype=np.complex128)
+
+        # Surface boundary condition
+        A[:,0,0] = 1.0
+        A[:,0,1] = np.exp(1j*self.m[:,0]*(hi[1]-hi[0]))
+        B[:,0] = self.hc
+
+        # Interface boundary conditions
+        for l in range(1,self.Nl):
+            # Eta continuous
+            A[:,2*l-1,2*(l-1)]   =  np.exp(1j*self.m[:,l-1]*(hi[l]-hi[l-1]))
+            A[:,2*l-1,2*(l-1)+1] =  1.0
+            A[:,2*l-1,2*(l-1)+2] = -1.0
+            A[:,2*l-1,2*(l-1)+3] = -np.exp(1j*self.m[:,l]*(hi[l+1]-hi[l]))
+            # d(eta)/dz continuous
+            A[:,2*l,2*(l-1)]   =  1j*self.m[:,l-1] * np.exp(1j*self.m[:,l-1]*(hi[l]-hi[l-1]))
+            A[:,2*l,2*(l-1)+1] = -1j*self.m[:,l-1]
+            A[:,2*l,2*(l-1)+2] = -1j*self.m[:,l]
+            A[:,2*l,2*(l-1)+3] =  1j*self.m[:,l]   * np.exp(1j*self.m[:,l]*(hi[l+1]-hi[l]))
+            # Exception for k=0: Set B_(l-1) to zero
+            A[0,2*l,2*(l-1)+1] =  1
+
+        # Top boundary condition
+        A[:,-1,-1] = 1
+
+        # Solve linear system for every k
+        X = np.linalg.solve(A,B)
+
+        # Compose solution in frequency space
+        # ----------------------------------
+
+        var = np.zeros((self.Nk,z.size),dtype=np.complex128)
+
+        if varname == 'eta':
+            # eta = A exp( jm (z-zlow) ) + B exp( jm (zhigh-z) )
+            for l in range(self.Nl):
+                mask = (z >= hi[l] ) & (z < hi[l+1])
+                # Ignore overflow, this should be captured by the mask
+                with np.errstate(over='ignore'):
+                    var += X[:,2*l,np.newaxis]   * np.where(mask[np.newaxis,:],np.exp(1j*self.m[:,l,np.newaxis]*(z-hi[l])),0)
+                    var += X[:,2*l+1,np.newaxis] * np.where(mask[np.newaxis,:],np.exp(1j*self.m[:,l,np.newaxis]*(hi[l+1]-z)),0)
+
+        elif varname == 'w':
+            # From definition w = U * d(eta)/dx
+            for l in range(self.Nl):
+                mask = (z >= hi[l] ) & (z < hi[l+1])
+                # Ignore overflow, this should be captured by the mask
+                with np.errstate(over='ignore'):
+                    var += 1j * self.Us[l] * self.k[:, np.newaxis] * X[:,2*l,np.newaxis]   * \
+                                np.where(mask[np.newaxis,:],np.exp(1j*self.m[:,l,np.newaxis]*(z-hi[l])),0)
+                    var += 1j * self.Us[l] * self.k[:, np.newaxis] * X[:,2*l+1,np.newaxis] * \
+                                np.where(mask[np.newaxis,:],np.exp(1j*self.m[:,l,np.newaxis]*(hi[l+1]-z)),0)
+
+        assert(not np.isnan(var).any()), 'Solution contains nans, probably due to overflow'
+        # Set defunct modes to zero
+        var[-1,:] = 0.
+        return np.squeeze(np.fft.irfft(var,axis=0,norm='forward'))
+
+
+
+# Build A matrix
+
+#        elif varname == 'u':
+#            # From continuity equation du/dx + dw/dz = 0
+#            A = -1j*self.U*self.m * self.hc
+#        elif varname == 'p':
+#            # From x-momentum equation U * du/dx = - dp/dx
+#            A = 1j * self.U**2 * self.m * self.hc
