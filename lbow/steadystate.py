@@ -270,6 +270,10 @@ class MultiLayerModel(object):
         """
         assert(varname in ['eta','u','w','p'])
 
+        if varname in ['u','p']:
+            print('Solution in terms of u or p not yet implemented')
+            return
+
         if np.isscalar(z): z = np.array([z])
         assert(all(z>=0)), 'All z must be positive'
 
