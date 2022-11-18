@@ -24,10 +24,10 @@ The contents of this repository are licensed under an **Apache License v2.0** (s
 
 Copyright notice:
 
-Technische Universiteit Delft hereby disclaims all copyright interest in the program “LBoW”. LBoW is a python package to solve Linear Buoyancy Wave problems written by the Author(s). 
+Technische Universiteit Delft hereby disclaims all copyright interest in the program “LBoW”. LBoW is a python package to solve Linear Buoyancy Wave problems written by the Author(s).  
 Henri Werij, Dean of Faculty of Aerospace Engineering, Technische Universiteit Delft.
 
-Copyright 2022 Dries Allaerts
+&copy; 2022, D. Allaerts
 
 ## References
 Linear theory of buoyancy waves is fairly standard text book material and can be found in, e.g.,
