@@ -7,7 +7,7 @@ See the `dev` branch for the latest code under development
 The code runs from python 3.10, but highest version is recommended. The core python libraries of the package only depend on numpy. Demonstration of the package is done via jupyter notebooks and depends on jupyter and matplotlib.
 
 ## Installation
-To install, run `pip install -e lbow` after cloning the repository (or `pip install -e .` from inside `/path/to/lbow`)
+To install, run `pip install -e lbow` after cloning the repository (or `pip install -e .` from inside `/path/to/lbow`).
 
 ## Structure
 In this repository you can find:
@@ -35,6 +35,7 @@ Linear theory of buoyancy waves is fairly standard text book material and can be
 - Gossard, E., Hooke, W.H., 1975. Waves in the atmosphere, Developments in atmospheric science 2. Elsevier Scientific Publishing Company.
 - Gill, A.E., 1982. Atmosphere-ocean dynamics, Nachdr. ed, International geophysics series. Acad. Press, San Diego.
 - Nappo, C.J., 2002. An introduction to atmospheric gravity waves, International geophysics series. Academic Press, San Diego.
+- Pedlosky, J., 2003. Waves in the ocean and atmosphere: Introduction to wave dynamics. Springer, Berlin ; New York.
 
 ## Would you like to contribute?
 
