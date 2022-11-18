@@ -20,7 +20,7 @@ This software has been developed by
 **Dries Allaerts** ![ORCID logo](https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png) [0000-0002-8758-3952](https://orcid.org/0000-0002-8758-3952), Technische Universiteit Delft
 
 ## License
-The contents of this repository are licensed under an **Apache License v2.0** (see [LICENSE](LICENSE) file).
+The contents in the `docs/` directory are licensed under a **CC-BY 4.0** (see [CC-BY-4.0](LICENSES/CC-BY-4.0.txt) file). The source code and any other files in this repository are licensed under an **Apache License v2.0** (see [Apache-License-v2.0](LICENSES/Apache-License-v2.0.txt) file).
 
 Copyright notice:
 
