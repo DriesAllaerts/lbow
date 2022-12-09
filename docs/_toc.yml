@@ -11,4 +11,5 @@ chapters:
   sections:
   - file: halfPlaneModel
   - file: channelModel
+- file: multiLayerModel
 - file: bibliography
