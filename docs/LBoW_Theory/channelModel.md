@@ -1,13 +1,20 @@
 # Channel Model
 
-The Channel Model assumes that the flow is bounded above by a rigid lid at a certain height $H$, causing downward wave reflections. This situation is reminiscent of numerical simulations of buoyancy waves with inadequate reflective boundary conditions at the top of the numerical domain. The rigid lid condition translates to $\eta_1(x,H,t)=0$, and hence $\hat{\eta}_1(k,H,\omega)=0$. Combined with the surface boundary condition {eq}`eqn:Fourier_BC`, this results in a system of equations in terms of the unknowns $A$ and $B$:
-```{math}
-:label: eqn:ABsystem
+The Channel Model assumes that the flow is bounded above by a rigid lid at a certain height $H$, causing downward wave reflections. This situation is reminiscent of numerical simulations of buoyancy waves with inadequate reflective boundary conditions at the top of the numerical domain.
+
+We first derive the solution for the general, transient flow scenario. Next, we present the simpler solution for a steady state flow scenario.
+
+## Transient solution
+
+The rigid lid condition translates to $\eta_1(x,H,t)=0$, and hence $\hat{\eta}_1(k,H,\omega)=0$. Combined with the surface boundary condition {eq}`eqn:Fourier_BC`, this results in a system of equations in terms of the unknowns $A$ and $B$:
+
+$$
 	\begin{cases}
 		A+B &= \hat{h}(k,\omega) \\
 		Ae^{jmH}+Be^{-jmH} &= 0
 	\end{cases}
-```
+$$ (eqn:ABsystem)
+
 where the same definition of vertical wave number is used as before (equation {eq}`eqn:m_HalfPlaneModel`). The solution to {eq}`eqn:ABsystem` can be written as
 ```{math}
 	A=\hat{h}(k,\omega)/(1-e^{2jmH}) \quad\text{and}\quad B = -\hat{h}(k,\omega)e^{2jmH}/(1-e^{2jmH})
