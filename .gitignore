@@ -10,3 +10,5 @@ __pycache__/
 
 # Jupyter Book builds
 docs/_build/
+
+**/.DS_Store
