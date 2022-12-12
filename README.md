@@ -1,5 +1,5 @@
 # Linear Buoyancy Wave package (LBoW)
-LBoW is a python package to solve Linear Buoyancy Wave problems.
+LBoW is a python package for solving linear buoyancy wave problems, like for example uniform stratified flow over a bell-shaped hill. The software presents a semi-analytical implementation of linear theory for stratified flow (i.e., the Taylor-Goldstein equation).
 
 See the `dev` branch for the latest code under development
 
@@ -43,6 +43,11 @@ Linear theory of buoyancy waves is fairly standard text book material and can be
 - Pedlosky, J., 2003. Waves in the ocean and atmosphere: Introduction to wave dynamics. Springer, Berlin ; New York.
 
 For more detailed references, check out the [documentation](https://driesallaerts.github.io/lbow/intro.html).
+
+## Cite this repository
+If you use this software, please cite it as below or check out the CITATION.cff file.
+
+**How to cite this repository**: Allaerts, D., 2022. LBoW - Linear Buoyancy Wave Package. 4TU.ResearchData. Software. https://doi.org/10.4121/21711227 
 
 ## Would you like to contribute?
 

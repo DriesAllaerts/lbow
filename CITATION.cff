@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Allaerts"
+  given-names: "Dries"
+  orcid: "https://orcid.org/0000-0002-8758-3952"
+title: "LBoW - Linear Buoyancy Wave Package"
+version: 0.1.0
+doi: 10.4121/21711227
+date-released: 2022-12-12
+url: "https://github.com/DriesAllaerts/lbow"

@@ -5,7 +5,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='lbow',
-    version='1.0.0',
+    version='0.1.0',
     description='Python package for solving linear buoyancy waves problems',
     author='Dries Allaerts',
     license='',
