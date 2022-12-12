@@ -33,3 +33,4 @@ html:
   use_repository_button     : true   # Add GitHub buttons to your book (see https://jupyterbook.org/customize/config.html#add-a-link-to-your-repository)
   use_edit_page_button      : false  # Add GitHub buttons to your book (see https://jupyterbook.org/customize/config.html#add-a-link-to-your-repository)
   use_issues_button         : false  # Add GitHub buttons to your book (see https://jupyterbook.org/customize/config.html#add-a-link-to-your-repository)
+  extra_footer              : This work is licensed under a <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
