@@ -7,6 +7,7 @@ options:
   numbered: true
 chapters:
 - file: linearTheory
+- file: verticalWaveNumber
 - file: oneLayerModel
   sections:
   - file: halfPlaneModel

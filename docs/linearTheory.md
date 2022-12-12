@@ -32,19 +32,24 @@ $$ (eqn:TaylorGoldstein_w)
 with the horizontal Laplacian operator and Brunt--Väisälä frequency defined as $\nabla^2_H=\frac{\partial^2}{\partial x^2}+\frac{\partial^2}{\partial y^2}$ and $N^2=\frac{g}{\theta_0}\frac{\mathrm{d}\theta_0}{\mathrm{d}z}$, respectively. Equation~{eq}`eqn:TaylorGoldstein_w` is a simplified form of the more general Taylor-Goldstein equation for wave motions in a stably stratified shear flow.
 
 Equation {eq}`eqn:TaylorGoldstein_w` can also be expressed in terms of the vertical displacement $\eta_1$ of a fluid parcel above its undisturbed level, which is related to the vertical wind speed perturbation via the kinematic condition {cite}`smith_linear_1980`
-```{math}
-:label: eqn:kinematicCondition
+
+$$
     w_1=\frac{\mathrm{D}\eta_1}{\mathrm{D}t}.
-```
+$$ (eqn:kinematicCondition)
+
 Substituting equation {eq}`eqn:kinematicCondition` into equation {eq}`eqn:TaylorGoldstein_w` gives
-```{math}
-:label: eqn:TaylorGoldstein_eta
+
+$$
     \left(\frac{\mathrm{D}}{\mathrm{D}t}\right)^2\nabla^2 \eta_1+N^2\nabla^2_H \eta_1=0.
-```
-Assuming a plane wave solution
-```{math}
-    \eta_1(x,y,z,t)=\hat{\eta}_1(z)\exp{[j(kx+ly-\omega t)]}
-```
+$$ (eqn:TaylorGoldstein_eta)
+
+We can find a solution for equation {eq}`eqn:TaylorGoldstein_eta` by assuming a plane wave solution of the form
+
+$$
+    \eta_1(x,y,z,t)=\hat{\eta}_1(z)\exp{[j(kx+ly-\omega t)]}.
+$$
+
+Substituting the planar wave form into {eq}`eqn:TaylorGoldstein_eta`
 results in
 
 $$
@@ -55,12 +60,14 @@ with the vertical wave number $m$ given by
 
 $$
     m^2=(k^2+l^2)\left(\frac{N^2}{\Omega^2}-1\right).
-$$ (eqn:dispersionEquation)
+$$ (eqn:dispersionEquation_1)
 
-The intrinsic frequency is hereby defined as $\Omega=\omega-\mathbf{u_0}\cdot\mathbf{k}$, with $\mathbf{k}=(k,l,m)$ the wave vector and $\mathbf{u_0}=(u_0,v_0,0)$ the background wind speed vector. It is important to remark that equation {eq}`eqn:dispersionEquation` gives rise to two possible solutions for $m$. For $\Omega^2<N^2$, $m$ is a real number and the planar wave is vertically propagating, while for $\Omega^2>N^2$, $m$ is imaginary and the wave becomes evanescent.
+The intrinsic frequency is hereby defined as $\Omega=\omega-\mathbf{u_0}\cdot\mathbf{k}$, with $\mathbf{k}=(k,l,m)$ the wave vector and $\mathbf{u_0}=(u_0,v_0,0)$ the background wind speed vector.
 
 Equation {eq}`eqn:characteristic_eqn` is a linear, homogeneous, ordinary differential equation of second order, for which the general solution can be written as
-```{math}
+
+$$
 \hat{\eta}_1(k,l,z,\omega) = A(k,l,\omega)e^{jm_1(k,l,\omega)z}+B(k,l,\omega)e^{jm_2(k,l,\omega)z},
-```
-with $m_1$ and $m_2$ the positive and negative roots of equation {eq}`eqn:dispersionEquation`, respectively. The coefficients $A$ and $B$ are determined by the boundary conditions.
+$$ (eqn:generalSolution)
+
+with $m_1$ and $m_2$ the roots of equation {eq}`eqn:dispersionEquation_1`. The coefficients $A$ and $B$ are determined by the boundary conditions.

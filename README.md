@@ -13,14 +13,19 @@ To install, run `pip install -e lbow` after cloning the repository (or `pip inst
 In this repository you can find:
 - `lbow/` directory containing the core python libraries
 - `notebooks/` directory containing jupyter notebooks to demonstrate the use of the lbow package
-- `docs/` directory containing documentation regarding the theory behind this package
+- `docs/` directory containing documentation regarding the theory behind this package (see also below)
+
+## Documentation
+The theory and mathematical expressions behind LBoW are described in a Jupyter Book that is hosted as a GitHub Page at [https://driesallaerts.github.io/lbow/intro.html](https://driesallaerts.github.io/lbow/intro.html).
+
+The source code for the Jupyter Book can be found in the `docs/` directory. The book's build files (i.e., the static html files) live in the `gh-pages` branch.
 
 ## Author(s)
 This software has been developed by
 **Dries Allaerts** ![ORCID logo](https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png) [0000-0002-8758-3952](https://orcid.org/0000-0002-8758-3952), Technische Universiteit Delft
 
 ## License
-The contents in the `docs/` directory are licensed under a **CC-BY 4.0** (see [CC-BY-4.0](LICENSES/CC-BY-4.0.txt) file). The source code and any other files in this repository are licensed under an **Apache License v2.0** (see [Apache-License-v2.0](LICENSES/Apache-License-v2.0.txt) file).
+The contents in the `docs/` directory are licensed under a **CC-BY 4.0** (see [CC-BY-4.0](LICENSES/CC-BY-4.0.txt) file). The source code, example notebooks, and any other file in this repository are licensed under an **Apache License v2.0** (see [Apache-License-v2.0](LICENSES/Apache-License-v2.0.txt) file).
 
 Copyright notice:
 
@@ -36,6 +41,8 @@ Linear theory of buoyancy waves is fairly standard text book material and can be
 - Gill, A.E., 1982. Atmosphere-ocean dynamics, Nachdr. ed, International geophysics series. Acad. Press, San Diego.
 - Nappo, C.J., 2002. An introduction to atmospheric gravity waves, International geophysics series. Academic Press, San Diego.
 - Pedlosky, J., 2003. Waves in the ocean and atmosphere: Introduction to wave dynamics. Springer, Berlin ; New York.
+
+For more detailed references, check out the [documentation](https://driesallaerts.github.io/lbow/intro.html).
 
 ## Would you like to contribute?
 
