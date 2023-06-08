@@ -24,7 +24,7 @@ class OneLayerModel(object):
     """
     Base class for steady state models consisting of one layer
     """
-    def __init__(self,x,h,U,N,fftw_flag='FFTW_ESTIMATE'):
+    def __init__(self,x,h,U,N,hydrostatic=False,fftw_flag='FFTW_ESTIMATE'):
         """Initialize model and set governing parameters
 
         Args:
@@ -32,6 +32,7 @@ class OneLayerModel(object):
             h (array): surface elevation at x coordinates
             U (float): wind speed
             N (float): Brunt-Vaisala frequency
+            hydrostatic (bool): Make hydrostatic assumption (default to False)
             fftw_flag(string, optional): flag for the fftw algorithm
         """
 
@@ -53,7 +54,7 @@ class OneLayerModel(object):
         self.Nx = x.size
         self.k = 2.0 * np.pi * np.fft.rfftfreq(self.Nx,dx[0])
         # Calculate vertical wave numbers
-        self.m = self.vertical_wavenumbers()
+        self.m = self.vertical_wavenumbers(hydrostatic)
 
         # Set up forward fft routine
         hr = pyfftw.empty_aligned(h.shape,dtype='float64')
@@ -69,22 +70,28 @@ class OneLayerModel(object):
         # Store FFT of input signal h
         self.hc = fft_object(h)
 
-    def vertical_wavenumbers(self):
+    def vertical_wavenumbers(self,hydrostatic=False):
         """Calculate vertical wavenumbers
 
+        Args:
+            hydrostatic (bool): Make hydrostatic assumption (default to False)
         Returns:
             array: vertical wave numbers
         """
         m = np.zeros(self.k.shape,dtype=np.complex128)
-        #Evanescent waves
-        ievan = np.where((-self.U*self.k)**2>self.N**2)
-        #Propagating waves (excluding where U*k=0, for which m is set to zero) 
-        iprop = np.where(~(((-self.U*self.k)==0) | ((-self.U*self.k)**2>self.N**2)))
-    
-        m[ievan] = 1j*np.abs(self.k[ievan])*np.sqrt(1-self.N**2/(-self.U*self.k[ievan])**2)
-        # w_g = -Omega*m/kappa**2, so choose sign(m)=-sign(Omega).
-        # for stationary waves, omega=Omega+U*k=0, so Omega=-U*k
-        m[iprop] = -np.sign(-self.U*self.k[iprop])*np.abs(self.k[iprop])*np.sqrt(self.N**2/(-self.U*self.k[iprop])**2-1)
+
+        if hydrostatic:
+            m[:] = -np.sign(-self.U*self.k)*np.abs(self.N/self.U)
+        else:
+            #Evanescent waves
+            ievan = np.where((-self.U*self.k)**2>self.N**2)
+            #Propagating waves (excluding where U*k=0, for which m is set to zero) 
+            iprop = np.where(~(((-self.U*self.k)==0) | ((-self.U*self.k)**2>self.N**2)))
+        
+            m[ievan] = 1j*np.abs(self.k[ievan])*np.sqrt(1-self.N**2/(-self.U*self.k[ievan])**2)
+            # w_g = -Omega*m/kappa**2, so choose sign(m)=-sign(Omega).
+            # for stationary waves, omega=Omega+U*k=0, so Omega=-U*k
+            m[iprop] = -np.sign(-self.U*self.k[iprop])*np.abs(self.k[iprop])*np.sqrt(self.N**2/(-self.U*self.k[iprop])**2-1)
         return m
         
 class ChannelModel(OneLayerModel):
