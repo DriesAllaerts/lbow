@@ -194,7 +194,7 @@ class HalfPlaneModel(OneLayerModel):
         Returns:
             array: model solution at x coordinates and specified heights
         """
-        assert(varname in ['eta','u','w','p'])
+        assert(varname in ['eta','u','w','p','omega'])
 
         if np.isscalar(z): z = np.array([z])
         assert(all(z>=0)), 'All z must be positive'
@@ -212,6 +212,9 @@ class HalfPlaneModel(OneLayerModel):
         elif varname == 'p':
             # From x-momentum equation U * du/dx = - dp/dx
             A = 1j * self.U**2 * self.m * self.hc
+        elif varname == 'omega':
+            # Spanwise vorticity du/dz- dw/dx
+            A = self.U * (self.m**2 + self.k**2) * self.hc
 
         var = A[:,np.newaxis] * np.exp(1j*self.m[:,np.newaxis]*z)
         # Set defunct modes to zero
