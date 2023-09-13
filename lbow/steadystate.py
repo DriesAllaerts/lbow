@@ -183,18 +183,20 @@ class HalfPlaneModel(OneLayerModel):
     Steady state one-layer model with the ground surface as bottom boundary
     and the top boundary at infinity (radiation boundary condition)
     """
-    def solve(self,varname,z,fftw_flag='FFTW_ESTIMATE'):
+    def solve(self,varname,z,space='real',fftw_flag='FFTW_ESTIMATE'):
         """Solve model at specified heights
 
         Args:
             varname (str): name of the variable to be calculated (eta, u, w, or p)
             z (float or array): height(s) at which the variable is calculated
+            space (str): return solution in 'real' or 'fourier' space
             fftw_flag(string, optional): flag for the fftw algorithm
 
         Returns:
-            array: model solution at x coordinates and specified heights
+            array: model solution at x (or k) coordinates and specified heights
         """
         assert(varname in ['eta','u','w','p'])
+        assert(space in ['real','fourier'])
 
         if np.isscalar(z): z = np.array([z])
         assert(all(z>=0)), 'All z must be positive'
@@ -217,16 +219,19 @@ class HalfPlaneModel(OneLayerModel):
         # Set defunct modes to zero
         var[-1,:] = 0.
 
-        # Set up inverse fft routine
-        var_c = pyfftw.empty_aligned(var.shape,dtype='complex128')
-        var_r = pyfftw.empty_aligned((2*var.shape[0]-2,var.shape[1]),dtype='float64')
+        if space == 'fourier':
+            return np.squeeze(var)
+        else:
+            # Set up inverse fft routine
+            var_c = pyfftw.empty_aligned(var.shape,dtype='complex128')
+            var_r = pyfftw.empty_aligned((2*var.shape[0]-2,var.shape[1]),dtype='float64')
 
-        ifft_object = pyfftw.FFTW(var_c,var_r,axes=(0,),
-            flags=(fftw_flag,),
-            direction='FFTW_BACKWARD',
-            threads=multiprocessing.cpu_count(),
-            normalise_idft=False
-        )
+            ifft_object = pyfftw.FFTW(var_c,var_r,axes=(0,),
+                flags=(fftw_flag,),
+                direction='FFTW_BACKWARD',
+                threads=multiprocessing.cpu_count(),
+                normalise_idft=False
+            )
 
-        return np.squeeze(ifft_object(var))
-        #return np.squeeze(np.fft.irfft(var,axis=0,norm='forward'))
+            return np.squeeze(ifft_object(var))
+            #return np.squeeze(np.fft.irfft(var,axis=0,norm='forward'))
