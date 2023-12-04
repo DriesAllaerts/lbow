@@ -140,7 +140,7 @@ class HalfPlaneModel(OneLayerModel):
         Returns:
             array: model solution at x coordinates and specified heights
         """
-        assert(varname in ['eta','u','w','p'])
+        assert(varname in ['eta','u','w','p','omega'])
 
         if np.isscalar(z): z = np.array([z])
         assert(all(z>=0)), 'All z must be positive'
@@ -154,14 +154,19 @@ class HalfPlaneModel(OneLayerModel):
             A = -1j * self.Omega * self.hc
         elif varname == 'u':
             # From continuity equation du/dx + dw/dz = 0
-            #A = -1j * self.Omega * self.m * self.hc / self.k
-            print('Currently, you can only solve for eta or w, solving for u is not (yet) implemented')
-            pass
+            with np.errstate(divide='ignore',invalid='ignore'):
+                A = 1j * self.Omega * self.m * self.hc / self.k
+            A[self.k == 0] = 0.
         elif varname == 'p':
             # From x-momentum equation U * du/dx = - dp/dx
             #A = 1j * self.U * self.Omega * self.m * self.hc / self.k
             print('Currently, you can only solve for eta or w, solving for p is not (yet) implemented')
             pass
+        elif varname == 'omega':
+            # Spanwise vorticity du/dz- dw/dx
+            with np.errstate(divide='ignore',invalid='ignore'):
+                A = - self.k * self.N**2 * self.hc / self.Omega
+            A[np.isclose(self.Omega/np.max(np.abs(self.Omega)),0,atol=1e-06)] = 0.
 
         var = A[np.newaxis,...] * np.exp(1j*self.m[np.newaxis,...]*z[:,np.newaxis,np.newaxis])
         # Set defunct modes to zero?
