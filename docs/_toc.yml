@@ -10,6 +10,7 @@ chapters:
 - file: verticalWaveNumber
 - file: oneLayerModel
   sections:
-  - file: halfPlaneModel
-  - file: channelModel
+  - file: surfaceBoundaryCondition
+  - file: 1Dmodels
+  - file: 2Dmodels
 - file: bibliography

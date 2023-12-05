@@ -29,7 +29,7 @@ $$
     \left(\frac{\mathrm{D}}{\mathrm{D}t}\right)^2\nabla^2 w_1+N^2\nabla^2_H w_1=0.
 $$ (eqn:TaylorGoldstein_w)
 
-with the horizontal Laplacian operator and Brunt--Väisälä frequency defined as $\nabla^2_H=\frac{\partial^2}{\partial x^2}+\frac{\partial^2}{\partial y^2}$ and $N^2=\frac{g}{\theta_0}\frac{\mathrm{d}\theta_0}{\mathrm{d}z}$, respectively. Equation~{eq}`eqn:TaylorGoldstein_w` is a simplified form of the more general Taylor-Goldstein equation for wave motions in a stably stratified shear flow.
+with the horizontal Laplacian operator and Brunt--Väisälä frequency defined as $\nabla^2_H=\frac{\partial^2}{\partial x^2}+\frac{\partial^2}{\partial y^2}$ and $N^2=\frac{g}{\theta_0}\frac{\mathrm{d}\theta_0}{\mathrm{d}z}$, respectively. Equation {eq}`eqn:TaylorGoldstein_w` is a simplified form of the more general Taylor-Goldstein equation for wave motions in a stably stratified shear flow.
 
 Equation {eq}`eqn:TaylorGoldstein_w` can also be expressed in terms of the vertical displacement $\eta_1$ of a fluid parcel above its undisturbed level, which is related to the vertical wind speed perturbation via the kinematic condition {cite}`smith_linear_1980`
 

@@ -15,7 +15,7 @@ It is convenient for the further development of the theory to introduce a sign c
 
 For evanescent waves ($\Omega^2>N^2$), the general solution {eq}`eqn:generalSolution` shows that we need to take the positive imaginary root to obtain a decreasing amplitude with increasing height.
 
-For propagating waves ($\Omega^2<N^2$), we need to identify waves with a vertical group velocity pointing upwards. The group velocity relative to the flow is defined as $\mathbf{c}_g=(\partial\Omega/\partial k,\partial\Omega/\partial l,\partial\Omega/\partial m)$. The group velocity relative to the ground can be found by taking the derivative of the apparent frequency $\omega$ rather than the intrinsic frequency, but since $\omega=\Omega+\mathbf{u}_0\cdot\mathbf{k}$, this comes down to a simple vector summation. As the background vertical velocity is assumed to be zero, $w_g=\partial\Omega/\partial m$. The partial derivative of $\Omega$ to $m$ can be found by reformulating the expression of the vertical wavenumber $m$ ({eq}`eqn:dispersionEquation`) in terms of $\Omega$, which gives $\Omega=\pm N|k|/\sqrt{k^2+m^2}$. Then, it can be shown that $w_g=-\Omega m/(k^2+m^2)$. Hence, for $w_g$ to be positive, the vertical wave number must be chosen so that $\text{sign}(m)=-\text{sign}(\Omega)$.
+For propagating waves ($\Omega^2<N^2$), we need to identify waves with a vertical group velocity pointing upwards. The group velocity relative to the flow is defined as $\mathbf{c}_g=(\partial\Omega/\partial k,\partial\Omega/\partial l,\partial\Omega/\partial m)$. The group velocity relative to the ground can be found by taking the derivative of the apparent frequency $\omega$ rather than the intrinsic frequency, but since $\omega=\Omega+\mathbf{u}_0\cdot\mathbf{k}$, this comes down to a simple vector summation. As the background vertical velocity is assumed to be zero, $w_g=\partial\Omega/\partial m$. The partial derivative of $\Omega$ to $m$ can be found by reformulating the expression of the vertical wavenumber $m$ ({eq}`eqn:dispersionEquation`) in terms of $\Omega$, which gives $\Omega=\pm N\sqrt{k^2+l^2}/\sqrt{k^2+l^2+m^2}$. Then, it can be shown that $w_g=-\Omega m/(k^2+l^2+m^2)$. Hence, for $w_g$ to be positive, the vertical wave number must be chosen so that $\text{sign}(m)=-\text{sign}(\Omega)$.
 
 In summary, upward propagating/radiating waves have a vertical wave number given by
 
@@ -27,3 +27,7 @@ $$
 $$ (eqn:verticalWaveNumber)
 
 For downward propagating/radiating waves, the vertical wave number is $-m$.
+
+(sec:hydrostaticAssumtion)=
+## Hydrostatic assumption
+Work in progress ...
