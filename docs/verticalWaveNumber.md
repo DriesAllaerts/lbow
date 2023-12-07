@@ -1,7 +1,7 @@
 (sec:verticalWaveNumber)=
 # Vertical wave number
 
-As shown previously, the vertical wave number of bouyancy waves is related to the Brunt--Väisälä frequency, the intrinsic frequency, and the horizontal wave numbers by means of the dispersion equation:
+As shown previously, the vertical wave number of bouyancy waves is related to the buoyancy frequency, the intrinsic frequency, and the horizontal wave numbers by means of the dispersion equation:
 
 $$
     m^2=(k^2+l^2)\left(\frac{N^2}{\Omega^2}-1\right).
@@ -20,7 +20,7 @@ For propagating waves ($\Omega^2<N^2$), we need to identify waves with a vertica
 In summary, upward propagating/radiating waves have a vertical wave number given by
 
 $$
-    m(k,\omega) = \begin{cases}
+    m(k,l,\omega) = \begin{cases}
     j\sqrt{k^2+l^2}\sqrt{1-N^2/\Omega^2} & \text{for}\;\Omega^2>N^2, \\
     -\text{sign}(\Omega)\,\sqrt{k^2+l^2}\sqrt{N^2/\Omega^2-1} & \text{for}\;\Omega^2<N^2.
     \end{cases}
@@ -30,4 +30,19 @@ For downward propagating/radiating waves, the vertical wave number is $-m$.
 
 (sec:hydrostaticAssumtion)=
 ## Hydrostatic assumption
-Work in progress ...
+Sometimes the flow perturbation is assumed to be in hydrostatic equilibrium. Mathematically, this means that in equation {eq}`eqn:wmom`, the left-hand side is assumed to be negligible and the vertical pressure gradient is balanced by the buoyancy force. In this case, governing equations can still be reduced to equation {eq}`eqn:characteristic_eqn` but with the following dispersion relation:
+
+$$
+    m^2=(k^2+l^2)\frac{N^2}{\Omega^2}.
+$$ (eqn:hydrostaticDispersionEquation)
+
+The hydrostatic dispersion relation will always yield a real number for the vertical wave number, which means that under the hydrostatic assumption all planar waves propagate vertically and there are no evanescent waves.
+
+The vertical group velocity can be found in the same way as before. The intrinsic frequency is now given by $\Omega=\pm N\sqrt{k^2+l^2}/|m|$, from which it follows that $w_g=\partial\Omega/\partial m=-\Omega /m$. Similar to the non-hydrostatic case, for $w_g$ to be positive, the vertical wave number must be chosen so that $\text{sign}(m)=-\text{sign}(\Omega)$.
+
+In summary, upward propagating hydrostatic waves have a vertical wave number given by
+
+$$
+    m(k,l,\omega) = 
+    -\sqrt{k^2+l^2}\,\frac{N}{\Omega} 
+$$ (eqn:verticalWaveNumber)

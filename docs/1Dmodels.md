@@ -1,7 +1,7 @@
 (sec:1DModels)=
 # One-dimensional models
 
-All models assume the flow perturbation is one-dimensional, like a ridge line, for which there is no variation in the spanwise direction and $l=0$.
+One-dimensional models assume the flow perturbation is in only one direction, like a ridge line, for which there is no variation in the spanwise direction and $l=0$.
 
 
 (sec:PolarizationEqns)=
