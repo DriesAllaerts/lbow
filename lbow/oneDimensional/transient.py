@@ -1,5 +1,5 @@
 """
-Library for solving transient linear buoyancy wave problems
+Library for solving one-dimensional transient linear buoyancy wave problems
 
 Copyright 2022 Dries Allaerts
 

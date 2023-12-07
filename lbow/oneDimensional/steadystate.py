@@ -1,5 +1,5 @@
 """
-Library for solving steady state linear buoyancy wave problems
+Library for solving one-dimensional steady state linear buoyancy wave problems
 
 Copyright 2022 Dries Allaerts
 
