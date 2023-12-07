@@ -11,4 +11,4 @@ LBoW is a python package to solve Linear Buoyancy Wave problems. The following m
     - `OneLayerModel` class: Base class for transient models consisting of one single layer (i.e., uniform background flow parameters)
     - `HalfPlaneModel` class: Model with the ground surface as bottom boundary and the top boundary at infinity (radiation boundary condition).  
     See [4-1D-transient--impulse-response](../notebooks/4-1D-transient--impulse-response.ipynb) and [5-1D-transient--step-function](../notebooks/5-1D-transient--step-function.ipynb) notebooks for usage.
-- twoDimensional module, containing models for two-dimensional perturbations (isolated mountains) leading to three-dimensional flow problems (x-y-z)
+- [twoDimensional](twoDimensional/) module, containing models for two-dimensional perturbations (isolated mountains) leading to three-dimensional flow problems (x-y-z)
