@@ -23,13 +23,25 @@ $$
     \frac{\partial u_1}{\partial x}+\frac{\partial v_1}{\partial y}+\frac{\partial w_1}{\partial z}=0
 $$ (eqn:cont)
 
-with the material derivative $\frac{\mathrm{D}}{\mathrm{D}t} = \left(\frac{\partial}{\partial t}+\boldsymbol{u}_0\cdot\boldsymbol{\nabla}\right)$. Equations {eq}`eqn:umom`-{eq}`eqn:cont` can be reduced to a single equation in $w_1$ as follows. Taking the material derivative of the vertical momentum equation {eq}`eqn:wmom` allows the substitution of the potential temperature equation {eq}`eqn:theta`. The pressure is found by taking the divergence of the momentum equations {eq}`eqn:umom`-{eq}`eqn:wmom` and applying the continuity equation {eq}`eqn:cont`. This yields
+with the material derivative $\frac{\mathrm{D}}{\mathrm{D}t} = \left(\frac{\partial}{\partial t}+\boldsymbol{u}_0\cdot\boldsymbol{\nabla}\right)$. Equations {eq}`eqn:umom`-{eq}`eqn:cont` can be reduced to a single equation in $w_1$ as follows {cite}`gill_atmosphere-ocean_1982`. Taking the material derivative of the vertical momentum equation {eq}`eqn:wmom` allows the substitution of the potential temperature equation {eq}`eqn:theta`:
+
+$$
+    \frac{\mathrm{D}^2 w_1}{\mathrm{D}t^2} +N^2 w_1 = -\frac{1}{\rho_0}\frac{\mathrm{D}}{\mathrm{D}t}\frac{\partial p_1}{\partial z}
+$$ (eqn:vertical_part)
+
+with the buoyancy frequency defined as $N^2=\frac{g}{\theta_0}\frac{\mathrm{d}\theta_0}{\mathrm{d}z}$. An equation for the pressure can be found by taking the time derivative of the continuity equation {eq}`eqn:cont` and substituting the momentum equations {eq}`eqn:umom`-{eq}`eqn:vmom`:
+
+$$
+    \frac{\mathrm{D}}{\mathrm{D}t} \frac{\partial w_1}{\partial z} = \frac{1}{\rho_0}\nabla^2_H p_1.
+$$ (eqn:horizontal_part)
+
+with the horizontal Laplacian operator defined as $\nabla^2_H=\frac{\partial^2}{\partial x^2}+\frac{\partial^2}{\partial y^2}$. Combining equations {eq}`eqn:vertical_part` and {eq}`eqn:horizontal_part` to eliminate $p_1$ yields
 
 $$
     \left(\frac{\mathrm{D}}{\mathrm{D}t}\right)^2\nabla^2 w_1+N^2\nabla^2_H w_1=0.
 $$ (eqn:TaylorGoldstein_w)
 
-with the horizontal Laplacian operator and Brunt--Väisälä frequency defined as $\nabla^2_H=\frac{\partial^2}{\partial x^2}+\frac{\partial^2}{\partial y^2}$ and $N^2=\frac{g}{\theta_0}\frac{\mathrm{d}\theta_0}{\mathrm{d}z}$, respectively. Equation {eq}`eqn:TaylorGoldstein_w` is a simplified form of the more general Taylor-Goldstein equation for wave motions in a stably stratified shear flow.
+Equation {eq}`eqn:TaylorGoldstein_w` is a simplified form of the more general Taylor-Goldstein equation for wave motions in a stably stratified shear flow.
 
 Equation {eq}`eqn:TaylorGoldstein_w` can also be expressed in terms of the vertical displacement $\eta_1$ of a fluid parcel above its undisturbed level, which is related to the vertical wind speed perturbation via the kinematic condition {cite}`smith_linear_1980`
 

@@ -45,4 +45,4 @@ In summary, upward propagating hydrostatic waves have a vertical wave number giv
 $$
     m(k,l,\omega) = 
     -\sqrt{k^2+l^2}\,\frac{N}{\Omega} 
-$$ (eqn:verticalWaveNumber)
+$$ (eqn:hydrostaticVerticalWaveNumber)

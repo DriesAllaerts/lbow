@@ -19,7 +19,7 @@ To obtain a boundary condition for $\hat{\eta}_1(k,l,\omega,z)$, the surface ele
 
 $$
 
-    \hat{h}(k,l,\omega)=\frac{1}{8\pi^3}\iiint_{-\infty}^{\infty}h(x,y,t)\exp{[-j(kx+ly-\omega t)]}\;\mathrm{d} x \,\mathrm{d} y \,\mathrm{d} t
+    \hat{h}(k,l,\omega)=\frac{1}{\left(2\pi\right)^3}\iiint_{-\infty}^{\infty}h(x,y,t)\exp{[-j(kx+ly-\omega t)]}\;\mathrm{d} x \,\mathrm{d} y \,\mathrm{d} t
 $$
 
 The boundary condition in real space (equation {eq}`eqn:real_BC`) then translates into a boundary condition per wavenumber--frequency pair:
