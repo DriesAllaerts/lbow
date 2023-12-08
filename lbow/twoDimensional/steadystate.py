@@ -24,7 +24,7 @@ class OneLayerModel(object):
     """
     Base class for 2D steady state models consisting of one layer
     """
-    def __init__(self,x,y,h,U,V,N,fftw_flag='FFTW_ESTIMATE'):
+    def __init__(self,x,y,h,U,V,N,hydrostatic=False,fftw_flag='FFTW_ESTIMATE'):
         """Initialize model and set governing parameters
 
         Args:
@@ -34,6 +34,7 @@ class OneLayerModel(object):
             U (float): wind speed (x-component)
             V (float): wind speed (y-component)
             N (float): buoyancy frequency
+            hydrostatic (bool): Make hydrostatic assumption (default to False)
             fftw_flag(string, optional): flag for the fftw algorithm
         """
         # Assertions
@@ -87,9 +88,10 @@ class OneLayerModel(object):
 
         #Intrinsic frequency
         self.Omega = - self.U*self.k - self.V*self.l
+        self.zeroOmegaIndex = np.isclose(self.Omega/np.max(np.abs(self.Omega)),0,atol=1e-06)
 
         # Calculate vertical wave numbers
-        self.m = self.vertical_wavenumbers()
+        self.m = self.vertical_wavenumbers(hydrostatic)
 
         # Set up forward fft routine
         hr = pyfftw.empty_aligned(h.shape,dtype='float64')
@@ -105,21 +107,30 @@ class OneLayerModel(object):
         # Store FFT of input signal h
         self.hc = fft_object(h)
 
-    def vertical_wavenumbers(self):
+    def vertical_wavenumbers(self,hydrostatic=False):
         """Calculate vertical wavenumbers
 
+        Args:
+            hydrostatic (bool): Make hydrostatic assumption (default to False)
         Returns:
             array: vertical wave numbers
         """
         m = np.zeros(self.k.shape,dtype=np.complex128)
-        #Evanescent waves
-        ievan = np.where(self.Omega**2>self.N**2)
-        #Propagating waves (excluding where Omega=0, for which m is set to zero) 
-        iprop = np.where(~((self.Omega==0) | (self.Omega**2>self.N**2)))
-    
-        m[ievan] = 1j*np.sqrt(self.k[ievan]**2+self.l[ievan]**2) * np.sqrt(1-self.N**2/self.Omega[ievan]**2)
-        # w_g = -Omega*m/kappa**2, so choose sign(m)=-sign(Omega).
-        m[iprop] = -np.sign(self.Omega[iprop])*np.sqrt(self.k[iprop]**2+self.l[iprop]**2) * np.sqrt(self.N**2/self.Omega[iprop]**2-1)
+
+        if hydrostatic:
+            with np.errstate(divide='ignore',invalid='ignore'):
+                m = -np.sqrt(self.k**2+self.l**2)*self.N/self.Omega
+            m[self.zeroOmegaIndex] = 0.
+        else:
+            #Evanescent waves
+            ievan = self.Omega**2>self.N**2
+            #Propagating waves (excluding where Omega=0, for which m is set to zero) 
+            #iprop = np.where(~((self.Omega==0) | (self.Omega**2>self.N**2)))
+            iprop = np.logical_and(~(self.Omega**2>self.N**2), ~self.zeroOmegaIndex)
+        
+            m[ievan] = 1j*np.sqrt(self.k[ievan]**2+self.l[ievan]**2) * np.sqrt(1-self.N**2/self.Omega[ievan]**2)
+            # w_g = -Omega*m/kappa**2, so choose sign(m)=-sign(Omega).
+            m[iprop] = -np.sign(self.Omega[iprop])*np.sqrt(self.k[iprop]**2+self.l[iprop]**2) * np.sqrt(self.N**2/self.Omega[iprop]**2-1)
         return m
         
 
