@@ -11,4 +11,4 @@ The use of the LBoW package is demonstrated by means of jupyter notebooks. The f
 - Two-dimensional perturbations (isolated mountain)
   - Steady state flow problems
     - [Isolated bell-shaped mountain](6-2D-steady-state--bell-shaped-mountain.ipynb) notebook, calculating the solution for uniform, stratified flow over a two-dimensional bell-shaped mountain
-    - [Isolated bell-shaped mountain (hydrostatic)](6-2D-steady-state--bell-shaped-mountain.ipynb) notebook, calculating the solution for uniform, stratified flow over a two-dimensional bell-shaped mountain under the hydrostatic assumption.
+    - [Isolated bell-shaped mountain (hydrostatic)](7-2D-steady-state--bell-shaped-mountain-hydrostatic.ipynb) notebook, calculating the solution for uniform, stratified flow over a two-dimensional bell-shaped mountain under the hydrostatic assumption.
