@@ -80,10 +80,14 @@ class OneLayerModel(object):
             # last axis corresponds to y
             k = 2.0 * np.pi * np.fft.fftfreq(self.Nx,dx[0])
             l = 2.0 * np.pi * np.fft.rfftfreq(self.Ny,dy[0])
+            self.kDefunctModeIndex = (int(self.Nx/2),slice(None))
+            self.lDefunctModeIndex = (slice(None),-1)
         else:
             # last axis corresponds to x
             k = 2.0 * np.pi * np.fft.rfftfreq(self.Nx,dx[0])
             l = 2.0 * np.pi * np.fft.fftfreq(self.Ny,dy[0])
+            self.kDefunctModeIndex = (slice(None),-1)
+            self.lDefunctModeIndex = (int(self.Ny/2),slice(None))
         self.k, self.l = np.meshgrid(k,l,indexing=indexing)
 
         #Intrinsic frequency
@@ -179,7 +183,10 @@ class HalfPlaneModel(OneLayerModel):
             pass
 
         var = A[np.newaxis,...] * np.exp(1j*self.m[np.newaxis,...]*z[:,np.newaxis,np.newaxis])
-        # Set defunct modes to zero?
+
+        # Set defunct modes to zero
+        var[(slice(None),) + self.kDefunctModeIndex] = 0.0
+        var[(slice(None),) + self.lDefunctModeIndex] = 0.0
 
         # Set up inverse fft routine
         var_c = pyfftw.empty_aligned(var.shape,dtype='complex128')
