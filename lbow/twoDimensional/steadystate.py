@@ -129,7 +129,6 @@ class OneLayerModel(object):
             #Evanescent waves
             ievan = self.Omega**2>self.N**2
             #Propagating waves (excluding where Omega=0, for which m is set to zero) 
-            #iprop = np.where(~((self.Omega==0) | (self.Omega**2>self.N**2)))
             iprop = np.logical_and(~(self.Omega**2>self.N**2), ~self.zeroOmegaIndex)
         
             m[ievan] = 1j*np.sqrt(self.k[ievan]**2+self.l[ievan]**2) * np.sqrt(1-self.N**2/self.Omega[ievan]**2)

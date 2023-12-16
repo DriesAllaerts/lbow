@@ -2,4 +2,4 @@
 
 ### Todo
 - [ ] Check upstream behaviour (domain too small?)
-- [ ] Check stripes in x,z contor plots
+- [ ] Deal with defunct modes in oneDimensional models (see solution in twoDimensional)
