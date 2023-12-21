@@ -1,5 +1,5 @@
 """
-Library for solving steady state linear buoyancy wave problems
+Library for solving one-dimensional steady state linear buoyancy wave problems
 
 Copyright 2022 Dries Allaerts
 
@@ -81,7 +81,8 @@ class OneLayerModel(object):
         m = np.zeros(self.k.shape,dtype=np.complex128)
 
         if hydrostatic:
-            m[:] = -np.sign(-self.U*self.k)*np.abs(self.N/self.U)
+            #m[:] = -np.sign(-self.U*self.k)*np.abs(self.N/self.U)
+            m[:] = np.sign(self.k)*self.N/self.U
         else:
             #Evanescent waves
             ievan = np.where((-self.U*self.k)**2>self.N**2)

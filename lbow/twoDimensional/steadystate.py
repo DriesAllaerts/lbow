@@ -1,5 +1,5 @@
 """
-Library for solving transient linear buoyancy wave problems
+Library for solving two-dimensional steady state linear buoyancy wave problems
 
 Copyright 2022 Dries Allaerts
 
@@ -22,75 +22,80 @@ import pyfftw
 
 class OneLayerModel(object):
     """
-    Base class for transient models consisting of one layer
+    Base class for 2D steady state models consisting of one layer
     """
-    def __init__(self,x,t,h,U,N,fftw_flag='FFTW_ESTIMATE'):
+    def __init__(self,x,y,h,U,V,N,hydrostatic=False,fftw_flag='FFTW_ESTIMATE'):
         """Initialize model and set governing parameters
 
         Args:
             x (array): x coordinates (2D grid)
-            t (array): time coordinates (2D grid)
+            y (array): y coordinates (2D grid)
             h (array): surface elevation
-            U (float): wind speed
-            N (float): Brunt-Vaisala frequency
+            U (float): wind speed (x-component)
+            V (float): wind speed (y-component)
+            N (float): buoyancy frequency
+            hydrostatic (bool): Make hydrostatic assumption (default to False)
             fftw_flag(string, optional): flag for the fftw algorithm
         """
         # Assertions
         assert(len(x.shape)==2), 'x must be a two-dimensional grid'
-        assert(x.shape == t.shape), 'x and t must have same dimensions'
+        assert(x.shape == y.shape), 'x and y must have same dimensions'
         assert(x.shape == h.shape), 'x and h must have same dimensions'
         assert(np.isreal(h).all()), 'h should be real-valued'
-        assert(U != 0), 'Background wind speed should be non-zero'
+        assert((U^2+V^2) != 0), 'Background wind speed should be non-zero'
 
-        # Store wind speed and Brunt Vaisala frequency
+        # Store wind speed and buoyancy frequency
         self.U = U
+        self.V = V
         self.N = N
        
         # Determine if input grid follows 'ij' or 'xy' indexing 
         if np.unique(np.diff(x,axis=0))[0] != 0.:
             indexing = 'ij'
             xaxis = 0
-            taxis = 1
+            yaxis = 1
         else:
             indexing = 'xy'
             xaxis = 1
-            taxis = 0
+            yaxis = 0
 
         # Assert input coordinates have an even number of grid points
         assert(x.shape[xaxis] % 2 == 0), 'Number of grid points in x direction should be even'
-        assert(x.shape[taxis] % 2 == 0), 'Number of grid points in t direction should be even'
+        assert(x.shape[yaxis] % 2 == 0), 'Number of grid points in y direction should be even'
 
         self.Nx = x.shape[xaxis]
-        self.Nt = t.shape[taxis]
+        self.Ny = y.shape[yaxis]
 
-        # Calculate horizontal wave numbers and frequencies
+        # Calculate horizontal wave number
         dx = np.unique(np.diff(x,axis=xaxis))
-        dt = np.unique(np.diff(t,axis=taxis))
+        dy = np.unique(np.diff(y,axis=yaxis))
 
         assert(np.allclose(dx,dx[0])), 'x must be spaced equidistantly'
-        assert(np.allclose(dt,dt[0])), 't must be spaced equidistantly'
+        assert(np.allclose(dy,dy[0])), 'y must be spaced equidistantly'
 
         # We use rfft2 for efficiency, which means the last axis
         # will be transformed using rfft and accordingly only uses
         # half of the wavenumbers/frequencies
         if indexing == 'ij':
-            # last axis corresponds to t
+            # last axis corresponds to y
             k = 2.0 * np.pi * np.fft.fftfreq(self.Nx,dx[0])
-            omega = - 2.0 * np.pi * np.fft.rfftfreq(self.Nt,dt[0])
+            l = 2.0 * np.pi * np.fft.rfftfreq(self.Ny,dy[0])
+            self.kDefunctModeIndex = (int(self.Nx/2),slice(None))
+            self.lDefunctModeIndex = (slice(None),-1)
         else:
             # last axis corresponds to x
             k = 2.0 * np.pi * np.fft.rfftfreq(self.Nx,dx[0])
-            omega = - 2.0 * np.pi * np.fft.fftfreq(self.Nt,dt[0])
-        self.k, self.omega = np.meshgrid(k,omega,indexing=indexing)
-        # Note the minus sign for the frequencies. This is because in linear theory
-        # the solution is assumed to be a plane wave of the form exp[i(k*x-omega*t)],
-        # whereas the 2D Fourier transform uses exp[i(k*x+omega*t)]
+            l = 2.0 * np.pi * np.fft.fftfreq(self.Ny,dy[0])
+            self.kDefunctModeIndex = (slice(None),-1)
+            self.lDefunctModeIndex = (int(self.Ny/2),slice(None))
+        self.k, self.l = np.meshgrid(k,l,indexing=indexing)
 
         #Intrinsic frequency
-        self.Omega = self.omega - self.U*self.k
+        self.Omega = - self.U*self.k - self.V*self.l
+        self.zeroOmegaIndex = np.isclose(self.Omega/np.max(np.abs(self.Omega)),0,atol=1e-06)
 
         # Calculate vertical wave numbers
-        self.m = self.vertical_wavenumbers()
+        self.m = self.vertical_wavenumbers(hydrostatic)
 
         # Set up forward fft routine
         hr = pyfftw.empty_aligned(h.shape,dtype='float64')
@@ -106,27 +111,35 @@ class OneLayerModel(object):
         # Store FFT of input signal h
         self.hc = fft_object(h)
 
-    def vertical_wavenumbers(self):
+    def vertical_wavenumbers(self,hydrostatic=False):
         """Calculate vertical wavenumbers
 
+        Args:
+            hydrostatic (bool): Make hydrostatic assumption (default to False)
         Returns:
             array: vertical wave numbers
         """
         m = np.zeros(self.k.shape,dtype=np.complex128)
-        #Evanescent waves
-        ievan = np.where(self.Omega**2>self.N**2)
-        #Propagating waves (excluding where Omega=0, for which m is set to zero) 
-        iprop = np.where(~((self.Omega==0) | (self.Omega**2>self.N**2)))
-    
-        m[ievan] = 1j*np.abs(self.k[ievan])*np.sqrt(1-self.N**2/self.Omega[ievan]**2)
-        # w_g = -Omega*m/kappa**2, so choose sign(m)=-sign(Omega).
-        m[iprop] = -np.sign(self.Omega[iprop])*np.abs(self.k[iprop])*np.sqrt(self.N**2/self.Omega[iprop]**2-1)
+
+        if hydrostatic:
+            with np.errstate(divide='ignore',invalid='ignore'):
+                m = -np.sqrt(self.k**2+self.l**2)*self.N/self.Omega
+            m[self.zeroOmegaIndex] = 0.
+        else:
+            #Evanescent waves
+            ievan = self.Omega**2>self.N**2
+            #Propagating waves (excluding where Omega=0, for which m is set to zero) 
+            iprop = np.logical_and(~(self.Omega**2>self.N**2), ~self.zeroOmegaIndex)
+        
+            m[ievan] = 1j*np.sqrt(self.k[ievan]**2+self.l[ievan]**2) * np.sqrt(1-self.N**2/self.Omega[ievan]**2)
+            # w_g = -Omega*m/kappa**2, so choose sign(m)=-sign(Omega).
+            m[iprop] = -np.sign(self.Omega[iprop])*np.sqrt(self.k[iprop]**2+self.l[iprop]**2) * np.sqrt(self.N**2/self.Omega[iprop]**2-1)
         return m
         
 
 class HalfPlaneModel(OneLayerModel):
     """
-    Transient one-layer model with the ground surface as bottom boundary
+    Two-dimensional, steady state one-layer model with the ground surface as bottom boundary
     and the top boundary at infinity (radiation boundary condition)
     """
     def solve(self,varname,z,fftw_flag='FFTW_ESTIMATE'):
@@ -138,9 +151,9 @@ class HalfPlaneModel(OneLayerModel):
             fftw_flag(string, optional): flag for the fftw algorithm
 
         Returns:
-            array: model solution at x coordinates and specified heights
+            array: model solution at x,y coordinates and specified heights
         """
-        assert(varname in ['eta','u','w','p','omega'])
+        assert(varname in ['eta','u','v','w','p'])
 
         if np.isscalar(z): z = np.array([z])
         assert(all(z>=0)), 'All z must be positive'
@@ -153,23 +166,26 @@ class HalfPlaneModel(OneLayerModel):
             # From definition w = D(eta)/Dt
             A = -1j * self.Omega * self.hc
         elif varname == 'u':
-            # From continuity equation du/dx + dw/dz = 0
-            with np.errstate(divide='ignore',invalid='ignore'):
-                A = 1j * self.Omega * self.m * self.hc / self.k
-            A[self.k == 0] = 0.
+            print('Currently, you can only solve for eta or w, solving for u is not (yet) implemented')
+            pass
+#            with np.errstate(divide='ignore',invalid='ignore'):
+#                A = 1j * self.Omega * self.m * self.hc / self.k
+#            A[self.k == 0] = 0.
+        elif varname == 'v':
+            print('Currently, you can only solve for eta or w, solving for v is not (yet) implemented')
+            pass
+#            with np.errstate(divide='ignore',invalid='ignore'):
+#                A = 1j * self.Omega * self.m * self.hc / self.k
+#            A[self.k == 0] = 0.
         elif varname == 'p':
-            # From x-momentum equation U * du/dx = - dp/dx
-            #A = 1j * self.U * self.Omega * self.m * self.hc / self.k
             print('Currently, you can only solve for eta or w, solving for p is not (yet) implemented')
             pass
-        elif varname == 'omega':
-            # Spanwise vorticity du/dz- dw/dx
-            with np.errstate(divide='ignore',invalid='ignore'):
-                A = - self.k * self.N**2 * self.hc / self.Omega
-            A[np.isclose(self.Omega/np.max(np.abs(self.Omega)),0,atol=1e-06)] = 0.
 
         var = A[np.newaxis,...] * np.exp(1j*self.m[np.newaxis,...]*z[:,np.newaxis,np.newaxis])
-        # Set defunct modes to zero?
+
+        # Set defunct modes to zero
+        var[(slice(None),) + self.kDefunctModeIndex] = 0.0
+        var[(slice(None),) + self.lDefunctModeIndex] = 0.0
 
         # Set up inverse fft routine
         var_c = pyfftw.empty_aligned(var.shape,dtype='complex128')
